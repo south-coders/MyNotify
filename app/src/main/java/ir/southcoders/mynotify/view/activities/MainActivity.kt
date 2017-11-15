@@ -1,7 +1,8 @@
-package ir.southcoders.mynotify
+package ir.southcoders.mynotify.view.activities
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import ir.southcoders.mynotify.R
 
 class MainActivity : AppCompatActivity() {
 

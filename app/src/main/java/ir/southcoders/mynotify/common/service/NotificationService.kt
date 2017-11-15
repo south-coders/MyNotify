@@ -17,7 +17,7 @@ import java.io.ByteArrayOutputStream
  */
 
 class NotificationService : NotificationListenerService() {
-    internal var context: Context
+    lateinit var context: Context
 
     override fun onCreate() {
         super.onCreate()
@@ -35,7 +35,6 @@ class NotificationService : NotificationListenerService() {
         val text = extras.getCharSequence("android.text")!!.toString()
         val id1 = extras.getInt(Notification.EXTRA_SMALL_ICON)
         val id = sbn.notification.largeIcon
-
 
         Log.i("Package", pack)
         Log.i("Ticker", ticker)
