@@ -1,42 +1,24 @@
-package ir.southcoders.mynotify.common.utils.dbflow;
-
-import com.raizlabs.android.dbflow.annotation.Column;
-import com.raizlabs.android.dbflow.annotation.PrimaryKey;
-import com.raizlabs.android.dbflow.annotation.Table;
-import com.raizlabs.android.dbflow.structure.BaseModel;
-
-import java.util.Random;
-import java.util.UUID;
+package ir.southcoders.mynotify.model;
 
 /**
- * Created by Farzad on 11/25/2017.
+ * Created by Farzad on 2/17/2018.
  */
-@Table(database = AppDatabase.class)
-public class NotificationTable extends BaseModel{
-    @Column
-    @PrimaryKey
-    int id = (new Random()).nextInt(9999999);
 
-    @Column
+public class NotificationModel {
+    String id;
     String Package = null;
-
-    @Column
     String Ticker = null;
-
-    @Column
     String Title = null;
-
-    @Column
     String Date = null;
-
-    @Column
     String ImagePath = null;
-
-    @Column
     String Text = null;
 
-    public int getId() {
+    public String getId() {
         return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getPackage() {
@@ -44,7 +26,7 @@ public class NotificationTable extends BaseModel{
     }
 
     public void setPackage(String aPackage) {
-        this.Package = aPackage;
+        Package = aPackage;
     }
 
     public String getTicker() {
@@ -86,4 +68,5 @@ public class NotificationTable extends BaseModel{
     public void setText(String text) {
         Text = text;
     }
+
 }

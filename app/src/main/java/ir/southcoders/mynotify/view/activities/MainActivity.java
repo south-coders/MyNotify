@@ -7,17 +7,19 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.widget.Toast;
-
-import com.raizlabs.android.dbflow.sql.language.SQLite;
 
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 import ir.southcoders.mynotify.R;
-import ir.southcoders.mynotify.common.utils.dbflow.NotificationTable;
+import ir.southcoders.mynotify.common.utils.sqlite.DatabaseHandler;
+import ir.southcoders.mynotify.model.NotificationModel;
+import ir.southcoders.mynotify.view.adapters.AdapterRecent;
 
 /**
  * Created by Farzad on 11/25/2017.
@@ -25,49 +27,60 @@ import ir.southcoders.mynotify.common.utils.dbflow.NotificationTable;
 
 public final class MainActivity extends AppCompatActivity {
 
+    DatabaseHandler databaseHandler = null;
+    RecyclerView recyclerView ;
+
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_main);
 
         LocalBroadcastManager.getInstance(this).registerReceiver(onNotice, new IntentFilter("Msg"));
 
-        List<NotificationTable> notificationList = SQLite.select(). from(NotificationTable.class).queryList();
+        databaseHandler = new DatabaseHandler(getApplicationContext());
+
+        List<NotificationModel> notificationList = databaseHandler.getAllNotifications();
         Toast.makeText(this, "Saved Notifications Count : "+notificationList.size(), Toast.LENGTH_SHORT).show();
 
-        for (NotificationTable sn : notificationList){
-            Log.w("Id : ",sn.getId()+"");
-            Log.w("Title : ",sn.getTitle()+"");
-            Log.w("Data : ",sn.getDate()+"");
-            Log.w("ImagePath : ",sn.getImagePath()+"");
-            Log.w("Package : ",sn.getPackage()+"");
-            Log.w("Ticker : ",sn.getTicker()+"");
-            Log.w("Text : ",sn.getText()+"");
+        for (NotificationModel notificationModel : notificationList){
+            Log.w("Id : ",notificationModel.getId()+"");
+            Log.w("Title : ",notificationModel.getTitle()+"");
+            Log.w("Data : ",notificationModel.getDate()+"");
+            Log.w("ImagePath : ",notificationModel.getImagePath()+"");
+            Log.w("Package : ",notificationModel.getPackage()+"");
+            Log.w("Ticker : ",notificationModel.getTicker()+"");
+            Log.w("Text : ",notificationModel.getText()+"");
             Log.w("____________","____________");
         }
+
+        recyclerView = findViewById(R.id.recyclerview);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        AdapterRecent adapterRecent = new AdapterRecent(getApplicationContext(),notificationList);
+        recyclerView.setAdapter(adapterRecent);
     }
     private BroadcastReceiver onNotice= new BroadcastReceiver() {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            Toast.makeText(context, "onReceive", Toast.LENGTH_SHORT).show();
+
+            if (databaseHandler == null){
+                databaseHandler = new DatabaseHandler(getApplicationContext());
+            }
+
+            //Toast.makeText(context, "onReceive", Toast.LENGTH_SHORT).show();
             String pack = intent.getStringExtra("package");
             String ticker = intent.getStringExtra("ticker");
             String title = intent.getStringExtra("title");
             String text = intent.getStringExtra("text");
 
-            Log.i("Package",pack);
-            Log.i("Ticker",ticker);
-            Log.i("Title",title);
-            Log.i("Text",text);
+            NotificationModel notificationModel = new NotificationModel();
+            notificationModel.setTitle(title);
+            notificationModel.setTicker(ticker);
+            notificationModel.setPackage(pack);
+            notificationModel.setDate("Date");
+            notificationModel.setText(text);
+            notificationModel.setImagePath("ImagePath");
 
-            NotificationTable notification = new NotificationTable();
-            notification.setTitle(title);
-            notification.setTicker(ticker);
-            notification.setPackage(pack);
-            notification.setDate("Date");
-            notification.setText(text);
-            notification.setImagePath("ImagePath");
-            notification.save();
+            databaseHandler.addNotification(notificationModel);
         }
     };
 }

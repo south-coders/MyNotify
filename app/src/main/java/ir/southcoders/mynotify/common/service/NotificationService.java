@@ -24,31 +24,42 @@ public class NotificationService extends NotificationListenerService {
         context = getApplicationContext();
         Toast.makeText(context, "NotificationService on created", Toast.LENGTH_SHORT).show();
     }
+
     @Override
 
     public void onNotificationPosted(StatusBarNotification sbn) {
-        String pack = sbn.getPackageName();
-        String ticker = "";
-        if (sbn.getNotification().tickerText != null){
-            ticker = sbn.getNotification().tickerText.toString();
+        if (!sbn.isOngoing()) {
+            String pack = sbn.getPackageName();
+            String ticker = "";
+            if (sbn.getNotification().tickerText != null) {
+                ticker = sbn.getNotification().tickerText.toString();
+            }
+
+            Bundle extras = sbn.getNotification().extras;
+            String title = "";
+            String text = "";
+
+            if (extras.getString("android.title") != null) {
+                title = extras.getString("android.title");
+            }
+            if (extras.getString("android.text") != null) {
+                text = extras.getString("android.text");
+            }
+
+            //ferestadan data ha be mainActivity ba Broadcast
+            Intent msgrcv = new Intent("Msg");
+            msgrcv.putExtra("package", pack);
+            msgrcv.putExtra("ticker", ticker);
+            msgrcv.putExtra("title", title);
+            msgrcv.putExtra("text", text);
+
+            LocalBroadcastManager.getInstance(context).sendBroadcast(msgrcv);
         }
-        Bundle extras = sbn.getNotification().extras;
-        String title = extras.getString("android.title");
-        String text =extras.getString("android.text");
-
-        //ferestadan data ha be mainActivity ba Broadcast
-        Intent msgrcv = new Intent("Msg");
-        msgrcv.putExtra("package", pack);
-        msgrcv.putExtra("ticker", ticker);
-        msgrcv.putExtra("title", title);
-        msgrcv.putExtra("text", text);
-
-        LocalBroadcastManager.getInstance(context).sendBroadcast(msgrcv);
     }
 
     @Override
 
     public void onNotificationRemoved(StatusBarNotification sbn) {
-        Log.i("Msg","Notification Removed");
+        Log.i("Msg", "Notification Removed");
     }
 }
